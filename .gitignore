@@ -1,0 +1,12 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+env/
+venv/
+researchParsingEnv/
+.venv/
+
+# Environment variable files
+.env
