@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>References Table</title>
+</head>
+<body>
+  <h1>Extracted References</h1>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>First Author First Name</th>
+        <th>First Author Last Name</th>
+        <th>Title</th>
+        <th>Year</th>
+        <th>Journal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ref in references %}
+      <tr>
+        <td>{{ ref.first_name }}</td>
+        <td>{{ ref.last_name }}</td>
+        <td>{{ ref.title }}</td>
+        <td>{{ ref.year }}</td>
+        <td>{{ ref.journal }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
