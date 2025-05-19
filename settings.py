@@ -179,12 +179,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CREDS_PATH = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-if CREDS_PATH and Path(CREDS_PATH).is_file():
-    GS_CREDENTIALS = service_account.Credentials.from_service_account_file(CREDS_PATH)
-    print("DEBUG => Successfully loaded service account JSON:", CREDS_PATH)
-else:
-    print("DEBUG => Could NOT load service account JSON:", CREDS_PATH)
-
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
@@ -198,8 +192,3 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     }
 }
-
-# DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-# GS_BUCKET_NAME = 'my-research-parsing-bucket'
-# GS_PROJECT_ID = 'research-parsing'
-# GS_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
