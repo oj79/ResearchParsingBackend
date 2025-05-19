@@ -1,0 +1,27 @@
+<!-- parsing/templates/parsing/methods_and_tables.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Methods & Tables</title>
+  <style>
+    .output-container {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      width: 80%;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Methods Section</h1>
+  <div class="output-container">
+    {{ methods_text }}
+  </div>
+
+  <h1>Extracted Tables (JSON)</h1>
+  <div class="output-container">
+    {{ tables_json }}
+  </div>
+</body>
+</html>
