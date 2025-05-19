@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-from google.oauth2 import service_account
 
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")
@@ -30,7 +29,7 @@ SECRET_KEY = 'django-insecure-ks!l&suij&_u)dd7ksogqccre&2b*w90*b2trsfd482brezoub
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -178,13 +177,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CREDS_PATH = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
         "OPTIONS": {
             "project_id": "research-parsing",
-            "credentials": service_account.Credentials.from_service_account_file(CREDS_PATH),
             "bucket_name": "my-research-parsing-bucket",
         },
     },
