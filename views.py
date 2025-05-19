@@ -1,12 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 
 def home(request):
-    html = """
-    <html>
-      <body>
-        <h1>Hello from the root path!</h1>
-        <p><a href="/api/parsing/upload-form/">Upload a PDF here</a></p>
-      </body>
-    </html>
-    """
-    return HttpResponse(html)
+    return render(request, 'home.html')
