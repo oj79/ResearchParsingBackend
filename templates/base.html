@@ -1,0 +1,22 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Site</title>
+</head>
+<body>
+
+  <!-- Navigation bar or header area -->
+  <nav>
+    <!-- Replace the old local login/logout named URLs -->
+    <a href="/accounts/google/login/">Login (Google)</a> |
+    <a href="/accounts/logout/">Logout</a>
+  </nav>
+
+  <!-- Content block -->
+  {% block content %}
+  {% endblock %}
+
+</body>
+</html>
