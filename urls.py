@@ -17,11 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from .views import home
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', home, name='home'),  # root URL
     path('admin/', admin.site.urls),
     # Include the parsing app's URLs
     path('api/parsing/', include('ResearchParsing.parsing.urls')),
+    path('accounts/', include('allauth.urls')),
+    path('papers/', include('ResearchParsing.papers.urls')),
     # e.g., /api/parsing/parse-references/
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
