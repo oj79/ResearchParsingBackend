@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from google.oauth2 import service_account
+
+GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,7 +45,40 @@ INSTALLED_APPS = [
     'ResearchParsing.accounts',
     'ResearchParsing.papers',
     'ResearchParsing.parsing',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'storages',
 ]
+
+SITE_ID = 1
+LOGIN_REDIRECT_URL = '/'
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': GOOGLE_OAUTH_CLIENT_ID,
+            'secret': GOOGLE_OAUTH_CLIENT_SECRET,
+            'key': ''
+        },
+        'SCOPE': [
+            'openid',
+            'email',
+            'profile'
+        ],
+        'AUTH_PARAMS': {
+            'prompt': 'consent',     # Force re-consent
+            'access_type': 'offline' # Might help with tokens
+        },
+        'GET_PROFILE_FROM_ID_TOKEN': True,
+        'VERIFIED_EMAIL': True
+    }
+}
+
+LOGIN_URL = '/accounts/google/login/'
+ACCOUNT_ADAPTER = 'ResearchParsing.accounts.adapters.NoLocalSignupAdapter'
+SOCIALACCOUNT_ADAPTER = 'ResearchParsing.accounts.adapters.WhitelistSocialAdapter'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -48,6 +86,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -57,7 +96,7 @@ ROOT_URLCONF = 'ResearchParsing.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'ResearchParsing', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,6 +121,17 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'researchparsing_db',  # Your newly created database name
+#         'USER': os.environ.get('DATABASE_USER'),            # Or another user if you created one
+#         'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
@@ -120,7 +170,36 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CREDS_PATH = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+if CREDS_PATH and Path(CREDS_PATH).is_file():
+    GS_CREDENTIALS = service_account.Credentials.from_service_account_file(CREDS_PATH)
+    print("DEBUG => Successfully loaded service account JSON:", CREDS_PATH)
+else:
+    print("DEBUG => Could NOT load service account JSON:", CREDS_PATH)
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
+        "OPTIONS": {
+            "project_id": "research-parsing",
+            "credentials": service_account.Credentials.from_service_account_file(CREDS_PATH),
+            "bucket_name": "my-research-parsing-bucket",
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    }
+}
+
+# DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+# GS_BUCKET_NAME = 'my-research-parsing-bucket'
+# GS_PROJECT_ID = 'research-parsing'
+# GS_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
