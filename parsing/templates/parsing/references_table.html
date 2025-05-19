@@ -5,11 +5,24 @@
   <title>References Table</title>
 </head>
 <body>
+
+  <!-- Show Logout link and "View My Papers" only if user is authenticated -->
+  {% if user.is_authenticated %}
+    <a href="/accounts/logout/">Logout</a><br>
+    <a href="{% url 'papers:my_papers' %}">View My Papers</a>
+  {% endif %}
+  <br>
+
+  <!-- This link leads the user back to the upload PDF page -->
+  <a href="{% url 'parsing:upload_pdf_form' %}">Parse Another Paper</a>
+
   <h1>Extracted References</h1>
 
   <table border="1">
     <thead>
       <tr>
+        <!-- New column header for numbering -->
+        <th>No.</th>
         <th>First Author First Name</th>
         <th>First Author Last Name</th>
         <th>Title</th>
@@ -20,6 +33,8 @@
     <tbody>
       {% for ref in references %}
       <tr>
+        <!-- Use `forloop.counter` for 1-based indexing -->
+        <td>{{ forloop.counter }}</td>
         <td>{{ ref.first_name }}</td>
         <td>{{ ref.last_name }}</td>
         <td>{{ ref.title }}</td>
