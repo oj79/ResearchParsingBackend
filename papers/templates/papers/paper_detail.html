@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Paper Details</title>
+
+  <!-- References table styling (similar to references_table.html) -->
+  <style>
+    table {
+      border-collapse: collapse;
+      margin: 1em auto;
+      width: 80%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+
+    /* Summary container styling (similar to methods_tables_summary.html) */
+    .summary-container {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 1.1em;
+      line-height: 1.5;
+      color: #333;
+      width: 80%;
+      margin: 20px auto;
+    }
+    h1, h2 {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      text-align: center;
+      margin-top: 20px;
+      color: #444;
+    }
+    .centered-info {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Paper Details</h1>
+
+  <!-- Basic info about the paper -->
+  <div class="centered-info">
+    <p><strong>File:</strong> {{ paper.pdf_file.name }}</p>
+    <p><strong>Parse Type:</strong> {{ paper.get_parse_type_display }}</p>
+  </div>
+
+  {% comment %}
+    We show references in a table if parse_type includes references,
+    exactly like references_table.html.
+  {% endcomment %}
+  {% if paper.parse_type == 'references_only' or paper.parse_type == 'both' %}
+    <h2>References</h2>
+    {% if references %}
+      <table>
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Title</th>
+            <th>Year</th>
+            <th>Journal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in references %}
+            <tr>
+              <td>{{ r.first_name }}</td>
+              <td>{{ r.last_name }}</td>
+              <td>{{ r.title }}</td>
+              <td>{{ r.year }}</td>
+              <td>{{ r.journal }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="centered-info">No references found for this paper.</p>
+    {% endif %}
+  {% endif %}
+
+  {% comment %}
+    We show the final LLM summary for methods/tables if parse_type includes them,
+    just like methods_tables_summary.html used a "summary-container".
+  {% endcomment %}
+  {% if paper.parse_type == 'methods_tables_only' or paper.parse_type == 'both' %}
+    <h2>Summary of Methods & Tables</h2>
+    {% if paper.summary_text %}
+      <div class="summary-container">
+        {{ paper.summary_text|linebreaks }}
+      </div>
+    {% else %}
+      <p class="centered-info">No summary text found for this paper.</p>
+    {% endif %}
+  {% endif %}
+</body>
+</html>
