@@ -81,7 +81,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 LOGIN_URL = '/accounts/google/login/'
-ACCOUNT_ADAPTER = '"ResearchParsing.accounts.adapters.CustomAccountAdapter"'
+ACCOUNT_ADAPTER = 'ResearchParsing.accounts.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'ResearchParsing.accounts.adapters.WhitelistSocialAdapter'
 
 MIDDLEWARE = [
