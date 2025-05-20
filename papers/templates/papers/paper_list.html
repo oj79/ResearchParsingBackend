@@ -12,7 +12,7 @@
         <li>
           <strong>{{ paper.title|default:paper.pdf_file.name }}</strong>
           <small>({{ paper.get_parse_type_display }})</small>
-          <a href="{{ paper.pdf_file.url }}" download>Download PDF</a>
+          <a href="{% url 'papers:paper_download' paper.id %}">Download PDF</a>
           <a href="{% url 'papers:paper_detail' paper.id %}">View Details</a>
         </li>
       {% endfor %}
