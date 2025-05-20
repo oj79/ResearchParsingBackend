@@ -1,4 +1,6 @@
 # Create your views here.
+import os.path
+
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Paper
@@ -40,9 +42,13 @@ def paper_download(request, paper_id):
     file_data = paper.pdf_file.read()
     paper.pdf_file.close()
 
+    # Additionally, clean up the character at the end of the file name for normal file opening
+    raw_name = os.path.basename(paper.pdf_file.name)
+    clean_name = raw_name.rstrip("_")
+
     # 3. Return as a downloadable response
     #    You can detect the file mimetype if needed; here we assume PDF for example
     response = HttpResponse(file_data, content_type='application/pdf')
     # 'attachment' triggers a download; if you want inline view in browser, use 'inline'
-    response['Content-Disposition'] = f'attachment; filename={paper.pdf_file.name}"'
+    response['Content-Disposition'] = f'attachment; filename="{clean_name}"'
     return response
