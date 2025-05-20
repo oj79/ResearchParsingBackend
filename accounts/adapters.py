@@ -4,9 +4,15 @@ from django.core.exceptions import PermissionDenied
 from allauth.exceptions import ImmediateHttpResponse
 from django.shortcuts import render
 
-class NoLocalSignupAdapter(DefaultAccountAdapter):
+class CustomAccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request):
         return False
+
+    def add_message(self, request, level, message_template, message_context=None, extra_tags=''):
+        # Skip the login success message
+        if message_template == "account/messages/logged_in.txt":
+            return
+        super().add_message(request, level, message_template, message_context, extra_tags)
 
 ALLOWED_EMAILS = {
     "holdjt912@gmail.com",
@@ -29,3 +35,16 @@ class WhitelistSocialAdapter(DefaultSocialAccountAdapter):
                 "message": "Sorry, your email is not allowed at this time."
             })
             raise ImmediateHttpResponse(response)
+
+class NoLoginMessageAdapter(DefaultAccountAdapter):
+    """
+    Skips the 'Successfully signed in as ...' message by filtering out
+    certain allauth message templates.
+    """
+    def add_message(self, request, level, message_template, message_context=None, extra_tags=''):
+        # Skip the specific message template for successful login
+        if message_template == "account/messages/logged_in.txt":
+            return  # Don’t call super(), so the message is never added
+
+        # Otherwise proceed as normal
+        super().add_message(request, level, message_template, message_context, extra_tags)
