@@ -31,6 +31,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://research-parsing-service-86753116809.us-east1.run.app",
+    "https://www.researchparsing.com",
+]
+
 
 # Application definition
 
