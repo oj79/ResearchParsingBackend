@@ -42,46 +42,50 @@ from .grobid_auth import get_id_token
 
 def grobid_extract_methods(pdf_path):
     """
-    Calls GROBID to process the full text of a PDF, then searches the resulting TEI XML
-    for a 'methods' section. Returns a single string containing all text (including
-    any equations GROBID recognized as text).
+    Calls GROBID's /api/processFulltextDocument endpoint with multipart/form-data:
+      - field name 'input'
+      - Accept: application/xml
+    Then parses the TEI XML to find 'methods' sections or a 'div' whose head is 'method'.
     """
 
-    # 1) Verify PDF file existence
     if not os.path.exists(pdf_path):
         raise FileNotFoundError(f"PDF file not found: {pdf_path}")
 
-    # 2) Prepare the GROBID call with an ID token + new URL
+    # Fetch base URL and token for service-to-service auth
     grobid_base = getattr(settings, "GROBID_BASE_URL", "")
     if not grobid_base:
         raise ValueError("No GROBID_BASE_URL set in Django settings.")
+    token = get_id_token(grobid_base)
 
-    token = get_id_token(grobid_base)  # fetch ID token for GROBID
-    headers = {"Authorization": f"Bearer {token}"}
+    # Set headers with ID token + prefer TEI XML
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/xml"
+    }
 
-    # Same request logic, but with new url & headers
-    files = {}
-    with open(pdf_path, 'rb') as f:
-        files = {'input': (os.path.basename(pdf_path), f, 'application/pdf')}
+    # POST the PDF as multipart/form-data under key 'input'
+    with open(pdf_path, "rb") as f:
+        files = {"input": (os.path.basename(pdf_path), f, "application/pdf")}
         params = {
-            'consolidateHeader': 1,
-            'consolidateCitations': 0,
-            'segmentation': 'detailed',
-            'generateTeiIds': 1,
+            "consolidateHeader": 1,
+            "consolidateCitations": 0,
+            "segmentation": "detailed",
+            "generateTeiIds": 1
         }
         response = requests.post(
             f"{grobid_base}/api/processFulltextDocument",
             files=files,
             params=params,
-            headers=headers
+            headers=headers,
+            timeout=120
         )
         if response.status_code != 200:
             raise Exception(f"GROBID error: {response.status_code} - {response.text}")
 
-    # 3) Parse the returned TEI XML
     tei_xml = response.text
-    methods_text = parse_tei_for_methods(tei_xml)
-    return methods_text
+    # Optional debug:
+    print("DEBUG => TEI excerpt:", tei_xml[:2000], "...")
+    return parse_tei_for_methods(tei_xml)
 
 
 # def parse_tei_for_methods(tei_xml):
